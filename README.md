@@ -18,7 +18,6 @@ Aplicacao web feita com Vue 3, TypeScript e Firebase para controle de reservas d
 - Garcom recebe a reserva em tempo real no painel, com mesa reservada e resumo do pedido.
 - Garcom filtra reservas por data e horario e pode finalizar uma reserva para liberar a mesa.
 - Garcom pode avisar que esta indo atender, gerando notificacao para o cliente.
-- Firebase Cloud Messaging coleta token do navegador/celular para push notifications.
 - Admin visualiza informacoes dos clientes e funcionarios cadastrados.
 - CRUD completo para o Admin na colecao `reservas_restaurante`.
 
