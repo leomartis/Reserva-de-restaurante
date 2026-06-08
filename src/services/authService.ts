@@ -1,11 +1,13 @@
 import {
   createUserWithEmailAndPassword,
+  getAuth,
   signInWithEmailAndPassword,
   signOut,
   updateProfile,
 } from 'firebase/auth';
+import { deleteApp, getApp, getApps, initializeApp } from 'firebase/app';
 import { collection, doc, getDoc, getDocs, serverTimestamp, setDoc } from 'firebase/firestore';
-import { auth, db } from '../firebase';
+import { auth, db, firebaseConfig } from '../firebase';
 import type { UserProfile, UserRole } from '../types';
 
 function profileCacheKey(userId: string) {
@@ -68,6 +70,26 @@ export async function registerUser(name: string, email: string, password: string
   };
 
   await saveUserProfile(profile);
+
+  return credential.user;
+}
+
+export async function createWaiterUser(name: string, email: string, password: string) {
+  const secondaryApp = getApps().some((item) => item.name === 'waiter-creator')
+    ? getApp('waiter-creator')
+    : initializeApp(firebaseConfig, 'waiter-creator');
+  const secondaryAuth = getAuth(secondaryApp);
+  const credential = await createUserWithEmailAndPassword(secondaryAuth, email, password);
+
+  await updateProfile(credential.user, { displayName: name });
+  await saveUserProfile({
+    id: credential.user.uid,
+    name,
+    email,
+    role: 'garcom',
+  });
+  await signOut(secondaryAuth);
+  await deleteApp(secondaryApp);
 
   return credential.user;
 }

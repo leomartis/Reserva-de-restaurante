@@ -68,7 +68,12 @@
       @select="selectTable"
     />
 
-    <AdminUsersPanel v-if="isAdmin" :users="users" :reservations="reservations" />
+    <AdminUsersPanel
+      v-if="isAdmin"
+      :users="users"
+      :reservations="reservations"
+      :create-waiter="createWaiter"
+    />
 
     <div class="dashboard-grid" :class="{ 'client-layout': isClient }">
       <section v-if="canCreateReservation" class="form-panel">
@@ -116,7 +121,7 @@ import ReservationList from '../components/ReservationList.vue';
 import TableMap from '../components/TableMap.vue';
 import AdminUsersPanel from '../components/AdminUsersPanel.vue';
 import { useAuth } from '../composables/useAuth';
-import { getUserProfile, listUserProfiles, logoutUser, saveUserProfile } from '../services/authService';
+import { createWaiterUser, getUserProfile, listUserProfiles, logoutUser, saveUserProfile } from '../services/authService';
 import {
   createReservation,
   deleteReservation,
@@ -299,6 +304,11 @@ function selectTable(tableNumber: number) {
 async function removeReservation(id: string) {
   if (!isAdmin.value) return;
   await deleteReservation(id);
+}
+
+async function createWaiter(data: { name: string; email: string; password: string }) {
+  await createWaiterUser(data.name, data.email, data.password);
+  users.value = await listUserProfiles();
 }
 
 async function finalizeReservation(id: string) {

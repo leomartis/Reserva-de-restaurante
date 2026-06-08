@@ -23,6 +23,35 @@
       </div>
     </div>
 
+    <form class="staff-form" @submit.prevent="submitWaiter">
+      <div>
+        <p class="eyebrow">Funcionario</p>
+        <h3>Criar garcom</h3>
+      </div>
+
+      <label>
+        Nome
+        <input v-model.trim="waiterName" type="text" placeholder="Nome do garcom" required />
+      </label>
+
+      <label>
+        E-mail
+        <input v-model.trim="waiterEmail" type="email" placeholder="garcom@email.com" required />
+      </label>
+
+      <label>
+        Senha
+        <input v-model="waiterPassword" type="password" minlength="6" placeholder="Minimo 6 caracteres" required />
+      </label>
+
+      <button class="primary-button" type="submit" :disabled="creating">
+        {{ creating ? 'Criando...' : 'Criar garcom' }}
+      </button>
+    </form>
+
+    <p v-if="message" class="success-message">{{ message }}</p>
+    <p v-if="error" class="error">{{ error }}</p>
+
     <div v-if="users.length === 0" class="empty-state">
       Nenhum usuario encontrado. Se as contas foram criadas antes da colecao usuarios estar liberada no Firestore, faca login nelas novamente para sincronizar o perfil.
     </div>
@@ -41,12 +70,43 @@
 </template>
 
 <script setup lang="ts">
+import { ref } from 'vue';
 import type { Reservation, UserProfile, UserRole } from '../types';
 
 const props = defineProps<{
   users: UserProfile[];
   reservations: Reservation[];
+  createWaiter: (data: { name: string; email: string; password: string }) => Promise<void>;
 }>();
+
+const waiterName = ref('');
+const waiterEmail = ref('');
+const waiterPassword = ref('');
+const creating = ref(false);
+const message = ref('');
+const error = ref('');
+
+async function submitWaiter() {
+  creating.value = true;
+  message.value = '';
+  error.value = '';
+
+  try {
+    await props.createWaiter({
+      name: waiterName.value,
+      email: waiterEmail.value,
+      password: waiterPassword.value,
+    });
+    waiterName.value = '';
+    waiterEmail.value = '';
+    waiterPassword.value = '';
+    message.value = 'Garcom criado com sucesso.';
+  } catch {
+    error.value = 'Nao foi possivel criar o garcom.';
+  } finally {
+    creating.value = false;
+  }
+}
 
 function countByRole(role: UserRole) {
   return props.users.filter((item) => item.role === role).length;

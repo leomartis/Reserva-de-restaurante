@@ -5,6 +5,7 @@ Aplicacao web feita com Vue 3, TypeScript e Firebase para controle de reservas d
 ## Funcionalidades
 
 - Cadastro de usuario com e-mail e senha.
+- Cadastro publico cria apenas usuarios Cliente.
 - Login e logout via Firebase Authentication.
 - Controle de acesso com perfis:
   - Cliente: visualiza as mesas livres e escolhe uma mesa para reservar.
@@ -20,6 +21,7 @@ Aplicacao web feita com Vue 3, TypeScript e Firebase para controle de reservas d
 - Garcom pode avisar que esta indo atender, gerando notificacao para o cliente.
 - Firebase Cloud Messaging coleta token do navegador/celular para push notifications.
 - Admin visualiza informacoes dos clientes e funcionarios cadastrados.
+- Admin cria contas de Garcom pelo painel administrativo.
 - CRUD completo para o Admin na colecao `reservas_restaurante`.
 
 ## Como executar

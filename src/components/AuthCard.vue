@@ -19,15 +19,6 @@
         <input v-model.trim="name" type="text" autocomplete="name" placeholder="Seu nome" required />
       </label>
 
-      <label v-if="mode === 'register'">
-        Perfil
-        <select v-model="role" required>
-          <option value="cliente">Cliente</option>
-          <option value="garcom">Garcom</option>
-          <option value="admin">Administrador</option>
-        </select>
-      </label>
-
       <label>
         E-mail
         <input v-model.trim="email" type="email" autocomplete="email" placeholder="voce@email.com" required />
@@ -51,14 +42,12 @@
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { loginUser, registerUser } from '../services/authService';
-import type { UserRole } from '../types';
 
 const router = useRouter();
 const mode = ref<'login' | 'register'>('login');
 const name = ref('');
 const email = ref('');
 const password = ref('');
-const role = ref<UserRole>('cliente');
 const loading = ref(false);
 const error = ref('');
 const loadingLabel = ref('Aguarde...');
@@ -70,7 +59,7 @@ async function submit() {
 
   try {
     if (mode.value === 'register') {
-      await registerUser(name.value, email.value, password.value, role.value);
+      await registerUser(name.value, email.value, password.value, 'cliente');
     } else {
       await loginUser(email.value, password.value);
     }
