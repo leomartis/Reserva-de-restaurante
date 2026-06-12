@@ -23,9 +23,7 @@
       </div>
     </div>
 
-    <p class="admin-note">
-      Remover abaixo apaga somente o perfil do Firestore. Para usar o mesmo e-mail novamente, exclua tambem a conta em Authentication no Firebase Console.
-    </p>
+   
 
     <form class="staff-form" @submit.prevent="submitWaiter">
       <div>
