@@ -21,7 +21,7 @@ Aplicacao web feita com Vue 3, TypeScript e Firebase para controle de reservas d
 - Garcom pode avisar que esta indo atender, gerando notificacao para o cliente.
 - Admin visualiza informacoes dos clientes e funcionarios cadastrados.
 - Admin cria contas de Garcom pelo painel administrativo.
-- Admin remove perfis da colecao `usuarios` pelo painel, atualizando a listagem em tempo real.
+- Admin remove perfis da colecao `usuarios` pelo painel, atualizando a listagem em tempo real. Para reutilizar o mesmo e-mail, tambem e necessario excluir a conta em Authentication.
 - CRUD completo para o Admin na colecao `reservas_restaurante`.
 
 

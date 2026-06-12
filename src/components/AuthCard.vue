@@ -65,10 +65,24 @@ async function submit() {
     }
 
     await router.push('/painel');
-  } catch {
-    error.value = 'Nao foi possivel autenticar. Verifique os dados e tente novamente.';
+  } catch (exception) {
+    error.value = authErrorMessage(exception);
   } finally {
     loading.value = false;
   }
+}
+
+function authErrorMessage(exception: unknown) {
+  const code = typeof exception === 'object' && exception && 'code' in exception ? String(exception.code) : '';
+
+  if (code === 'auth/email-already-in-use') {
+    return 'Este e-mail ja esta cadastrado. Exclua a conta em Authentication ou use outro e-mail.';
+  }
+
+  if (code === 'auth/invalid-credential') {
+    return 'E-mail ou senha incorretos.';
+  }
+
+  return 'Nao foi possivel autenticar. Verifique os dados e tente novamente.';
 }
 </script>

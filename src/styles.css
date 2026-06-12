@@ -448,6 +448,16 @@ textarea:focus {
   font-size: 1.6rem;
 }
 
+.admin-note {
+  margin: 0 0 14px;
+  border: 1px solid #d8aa4e;
+  border-radius: 8px;
+  background: #fff5db;
+  color: #765300;
+  padding: 10px 12px;
+  font-weight: 800;
+}
+
 .users-table {
   display: grid;
   gap: 10px;

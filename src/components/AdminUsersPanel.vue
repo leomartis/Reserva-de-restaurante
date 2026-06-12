@@ -23,6 +23,10 @@
       </div>
     </div>
 
+    <p class="admin-note">
+      Remover abaixo apaga somente o perfil do Firestore. Para usar o mesmo e-mail novamente, exclua tambem a conta em Authentication no Firebase Console.
+    </p>
+
     <form class="staff-form" @submit.prevent="submitWaiter">
       <div>
         <p class="eyebrow">Funcionario</p>
@@ -64,7 +68,7 @@
         </div>
         <span class="status" :class="roleClass(item.role)">{{ roleLabel(item.role) }}</span>
         <span>{{ reservationCount(item.id) }} reserva(s)</span>
-        <button class="danger-button" type="button" @click="removeUser(item.id)">Remover </button>
+        <button class="danger-button" type="button" @click="removeUser(item.id)">Remover perfil</button>
       </article>
     </div>
   </section>
@@ -103,8 +107,8 @@ async function submitWaiter() {
     waiterEmail.value = '';
     waiterPassword.value = '';
     message.value = 'Garcom criado com sucesso.';
-  } catch {
-    error.value = 'Nao foi possivel criar o garcom.';
+  } catch (exception) {
+    error.value = authErrorMessage(exception);
   } finally {
     creating.value = false;
   }
@@ -119,8 +123,18 @@ function reservationCount(userId: string) {
 }
 
 async function removeUser(userId: string) {
-  if (!window.confirm('Remover este usuario do painel administrativo?')) return;
+  if (!window.confirm('Remover este perfil do Firestore? Para reutilizar o e-mail, exclua tambem a conta em Authentication.')) return;
   await props.deleteUser(userId);
+}
+
+function authErrorMessage(exception: unknown) {
+  const code = typeof exception === 'object' && exception && 'code' in exception ? String(exception.code) : '';
+
+  if (code === 'auth/email-already-in-use') {
+    return 'Este e-mail ainda existe no Firebase Authentication. Exclua a conta em Authentication antes de criar outra com o mesmo e-mail.';
+  }
+
+  return 'Nao foi possivel criar o garcom.';
 }
 
 function roleLabel(role: UserRole) {
