@@ -73,6 +73,7 @@
       :users="users"
       :reservations="reservations"
       :create-waiter="createWaiter"
+      :delete-user="deleteUser"
     />
 
     <div class="dashboard-grid" :class="{ 'client-layout': isClient }">
@@ -121,7 +122,14 @@ import ReservationList from '../components/ReservationList.vue';
 import TableMap from '../components/TableMap.vue';
 import AdminUsersPanel from '../components/AdminUsersPanel.vue';
 import { useAuth } from '../composables/useAuth';
-import { createWaiterUser, getUserProfile, listUserProfiles, logoutUser, saveUserProfile } from '../services/authService';
+import {
+  createWaiterUser,
+  deleteUserProfile,
+  getUserProfile,
+  logoutUser,
+  saveUserProfile,
+  watchUserProfiles,
+} from '../services/authService';
 import {
   createReservation,
   deleteReservation,
@@ -160,6 +168,7 @@ const selectedWaiterTime = ref('');
 const reservationsError = ref('');
 let unsubscribeReservations: Unsubscribe | null = null;
 let unsubscribeNotifications: Unsubscribe | null = null;
+let unsubscribeUsers: Unsubscribe | null = null;
 let unsubscribeForegroundMessages = () => undefined as void;
 
 const totalTables = RESTAURANT_TABLES.length;
@@ -249,13 +258,16 @@ onMounted(async () => {
   });
 
   if (profile.value.role === 'admin') {
-    users.value = await listUserProfiles();
+    unsubscribeUsers = watchUserProfiles((items) => {
+      users.value = items;
+    });
   }
 });
 
 onUnmounted(() => {
   unsubscribeReservations?.();
   unsubscribeNotifications?.();
+  unsubscribeUsers?.();
   unsubscribeForegroundMessages();
 });
 
@@ -308,7 +320,10 @@ async function removeReservation(id: string) {
 
 async function createWaiter(data: { name: string; email: string; password: string }) {
   await createWaiterUser(data.name, data.email, data.password);
-  users.value = await listUserProfiles();
+}
+
+async function deleteUser(userId: string) {
+  await deleteUserProfile(userId);
 }
 
 async function finalizeReservation(id: string) {

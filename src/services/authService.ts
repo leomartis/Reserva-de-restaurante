@@ -6,7 +6,17 @@ import {
   updateProfile,
 } from 'firebase/auth';
 import { deleteApp, getApp, getApps, initializeApp } from 'firebase/app';
-import { collection, doc, getDoc, getDocs, serverTimestamp, setDoc } from 'firebase/firestore';
+import {
+  collection,
+  deleteDoc,
+  doc,
+  getDoc,
+  getDocs,
+  onSnapshot,
+  serverTimestamp,
+  setDoc,
+  type Unsubscribe,
+} from 'firebase/firestore';
 import { auth, db, firebaseConfig } from '../firebase';
 import type { UserProfile, UserRole } from '../types';
 
@@ -32,19 +42,6 @@ function getCachedProfile(userId: string): UserProfile | null {
     localStorage.removeItem(profileCacheKey(userId));
     return null;
   }
-}
-
-function listCachedProfiles() {
-  return Object.keys(localStorage)
-    .filter((key) => key.startsWith('mesaRapida:userProfile:'))
-    .map((key) => {
-      try {
-        return JSON.parse(localStorage.getItem(key) || '') as UserProfile;
-      } catch {
-        return null;
-      }
-    })
-    .filter((profile): profile is UserProfile => Boolean(profile?.id));
 }
 
 export async function saveUserProfile(profile: UserProfile) {
@@ -127,19 +124,27 @@ export async function getUserProfile(userId: string): Promise<UserProfile | null
 
 export async function listUserProfiles(): Promise<UserProfile[]> {
   const snapshot = await getDocs(collection(db, 'usuarios'));
-  const firestoreProfiles = snapshot.docs
+  return snapshot.docs
     .map((item) => ({
       id: item.id,
       ...item.data(),
     })) as UserProfile[];
+}
 
-  const profilesById = new Map<string, UserProfile>();
+export function watchUserProfiles(callback: (users: UserProfile[]) => void): Unsubscribe {
+  return onSnapshot(collection(db, 'usuarios'), (snapshot) => {
+    const profiles = snapshot.docs.map((item) => ({
+      id: item.id,
+      ...item.data(),
+    })) as UserProfile[];
 
-  [...firestoreProfiles, ...listCachedProfiles()].forEach((item) => {
-    profilesById.set(item.id, item);
+    callback(profiles);
   });
+}
 
-  return [...profilesById.values()];
+export function deleteUserProfile(userId: string) {
+  localStorage.removeItem(profileCacheKey(userId));
+  return deleteDoc(doc(db, 'usuarios', userId));
 }
 
 export function logoutUser() {

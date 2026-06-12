@@ -64,6 +64,7 @@
         </div>
         <span class="status" :class="roleClass(item.role)">{{ roleLabel(item.role) }}</span>
         <span>{{ reservationCount(item.id) }} reserva(s)</span>
+        <button class="danger-button" type="button" @click="removeUser(item.id)">Remover </button>
       </article>
     </div>
   </section>
@@ -77,6 +78,7 @@ const props = defineProps<{
   users: UserProfile[];
   reservations: Reservation[];
   createWaiter: (data: { name: string; email: string; password: string }) => Promise<void>;
+  deleteUser: (userId: string) => Promise<void>;
 }>();
 
 const waiterName = ref('');
@@ -114,6 +116,11 @@ function countByRole(role: UserRole) {
 
 function reservationCount(userId: string) {
   return props.reservations.filter((item) => item.createdBy === userId).length;
+}
+
+async function removeUser(userId: string) {
+  if (!window.confirm('Remover este usuario do painel administrativo?')) return;
+  await props.deleteUser(userId);
 }
 
 function roleLabel(role: UserRole) {
